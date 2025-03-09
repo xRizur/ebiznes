@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DISCORD_TOKEN: <token>
+      DISCORD_CHANNEL_ID: "1348313374668099719"

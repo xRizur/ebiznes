@@ -1,0 +1,20 @@
+# Products
+GET     /products              controllers.ProductController.list
+GET     /products/:id          controllers.ProductController.get(id: Long)
+POST    /products              controllers.ProductController.create
+PUT     /products/:id          controllers.ProductController.update(id: Long)
+DELETE  /products/:id          controllers.ProductController.delete(id: Long)
+
+# Categories
+GET     /categories            controllers.CategoryController.list
+GET     /categories/:id        controllers.CategoryController.get(id: Long)
+POST    /categories            controllers.CategoryController.create
+PUT     /categories/:id        controllers.CategoryController.update(id: Long)
+DELETE  /categories/:id        controllers.CategoryController.delete(id: Long)
+
+# Cart (Koszyk)
+GET     /cart                  controllers.CartController.list
+GET     /cart/:id              controllers.CartController.get(id: Long)
+POST    /cart                  controllers.CartController.create
+PUT     /cart/:id              controllers.CartController.update(id: Long)
+DELETE  /cart/:id              controllers.CartController.delete(id: Long)

@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y \
-    python3.11 \
+    python3.10 \
     openjdk-8-jdk \
     kotlin \
     wget \
