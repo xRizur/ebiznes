@@ -12,7 +12,7 @@ POST    /categories            controllers.CategoryController.create
 PUT     /categories/:id        controllers.CategoryController.update(id: Long)
 DELETE  /categories/:id        controllers.CategoryController.delete(id: Long)
 
-# Cart (Koszyk)
+# Cart
 GET     /cart                  controllers.CartController.list
 GET     /cart/:id              controllers.CartController.get(id: Long)
 POST    /cart                  controllers.CartController.create

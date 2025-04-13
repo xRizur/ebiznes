@@ -5,13 +5,13 @@ services:
     build: .
     ports:
       - "9000:9000"
-    depends_on:
-      - ngrok
-      
+
   ngrok:
-    image: wernight/ngrok
-    command: ngrok http app:9000
+    image: ngrok/ngrok:latest
+    command: http app:9000
     ports:
       - "4040:4040"
     environment:
-      - NGROK_AUTHTOKEN=<token>
+      - NGROK_AUTHTOKEN=<paste token>
+    depends_on:
+      - app

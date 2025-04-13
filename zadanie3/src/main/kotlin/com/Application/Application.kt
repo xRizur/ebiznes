@@ -27,11 +27,11 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.json.*
 import kotlinx.coroutines.runBlocking
 
-val CATEGORIES = listOf("Electronics", "Books", "Clothing")
-val PRODUCTS = mapOf(
-    "electronics" to listOf("Smartphone", "Laptop", "Tablet", "Headphones", "Monitor"),
-    "books" to listOf("Novel", "Biography", "Fantasy",),
-    "clothing" to listOf("T-shirt", "Shoes", "Cap"),
+val KATEGORIE = listOf("Elektronika", "Książki", "Odzież")
+val PRODUKTY = mapOf(
+    "elektronika" to listOf("Smartfon", "Laptop", "Tablet", "Słuchawki", "Monitor"),
+    "książki" to listOf("Powieść", "Biografia", "Fantastyka",),
+    "odzież" to listOf("T-shirt", "Buty", "Czapka"),
 )
 
 fun main() {
@@ -41,8 +41,8 @@ fun main() {
 }
 
 suspend fun mainApp() = coroutineScope {
-    val discordToken = System.getenv("DISCORD_TOKEN") ?: error("Missing DISCORD_TOKEN environment variable")
-    val discordChannelId = System.getenv("DISCORD_CHANNEL_ID") ?: error("Missing DISCORD_CHANNEL_ID environment variable")
+    val discordToken = System.getenv("DISCORD_TOKEN") ?: error("Brak zmiennej środowiskowej DISCORD_TOKEN")
+    val discordChannelId = System.getenv("DISCORD_CHANNEL_ID") ?: error("Brak zmiennej środowiskowej DISCORD_CHANNEL_ID")
     val port = 8080
 
     @OptIn(PrivilegedIntent::class)
@@ -56,35 +56,35 @@ suspend fun mainApp() = coroutineScope {
             when (command) {
                 "!help" -> {
                     val helpMessage = """
-                    **Available commands:**
-                    `!categories` - Show all product categories
-                    `!products [category]` - Show products in the selected category
-                    `!help` - Display this help
+                    **Dostępne komendy:**
+                    `!kategorie` - Pokaż wszystkie kategorie produktów
+                    `!produkty [kategoria]` - Pokaż produkty w wybranej kategorii
+                    `!help` - Wyświetl pomoc
                     """.trimIndent()
                     message.channel.createMessage(helpMessage)
                 }
                 
-                "!categories" -> {
-                    if (CATEGORIES.isEmpty()) {
-                        message.channel.createMessage("No available categories.")
+                "!kategorie" -> {
+                    if (KATEGORIE.isEmpty()) {
+                        message.channel.createMessage("Brak dostępnych kategorii.")
                     } else {
-                        message.channel.createMessage("**Available categories:** ${CATEGORIES.joinToString(", ")}")
+                        message.channel.createMessage("**Dostępne kategorie:** ${KATEGORIE.joinToString(", ")}")
                     }
                 }
                 
-                "!products" -> {
+                "!produkty" -> {
                     if (parts.size < 2) {
-                        message.channel.createMessage("Usage: `!products [category]`\nAvailable categories: ${CATEGORIES.joinToString(", ")}")
+                        message.channel.createMessage("Użycie: `!produkty [kategoria]`\nDostępne kategorie: ${KATEGORIE.joinToString(", ")}")
                         return@on
                     }
                     
                     val categoryName = parts[1].lowercase()
-                    val products = PRODUCTS[categoryName] ?: emptyList()
+                    val products = PRODUKTY[categoryName] ?: emptyList()
                     
                     if (products.isEmpty()) {
-                        message.channel.createMessage("No products found for category: **$categoryName** or invalid category.\nCheck `!categories` to see available categories.")
+                        message.channel.createMessage("Brak produktów dla kategorii: **$categoryName** lub nieprawidłowa kategoria.\nSprawdź `!kategorie`, aby zobaczyć dostępne kategorie.")
                     } else {
-                        message.channel.createMessage("🛒 **Products in category $categoryName:**\n${products.joinToString("\n") { "- $it" }}")
+                        message.channel.createMessage("🛒 **Produkty w kategorii $categoryName:**\n${products.joinToString("\n") { "- $it" }}")
                     }
                 }
             }
@@ -105,25 +105,25 @@ suspend fun mainApp() = coroutineScope {
                 val params = call.receiveParameters()
                 val message = params["message"]
                     ?: return@post call.respondText(
-                        "Missing 'message' parameter", 
+                        "Brak parametru 'message'", 
                         status = HttpStatusCode.BadRequest
                     )
                 
                 try {
                     val channel = kord.getChannel(Snowflake(discordChannelId)) as? TextChannelBehavior
                         ?: return@post call.respondText(
-                            "Channel not found with ID: $discordChannelId", 
+                            "Nie znaleziono kanalu o ID: $discordChannelId", 
                             status = HttpStatusCode.NotFound
                         )
                     
                     channel.createMessage(message)
                     call.respondText(
-                        "Message sent successfully!", 
+                        "Wiadomość została wysłana pomyślnie!", 
                         status = HttpStatusCode.OK
                     )
                 } catch (e: Exception) {
                     call.respondText(
-                        "Error sending message: ${e.message}", 
+                        "Błąd podczas wysyłania wiadomości: ${e.message}", 
                         status = HttpStatusCode.InternalServerError
                     )
                 }
