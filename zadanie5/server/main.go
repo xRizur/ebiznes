@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/glebarez/sqlite"
-	"github.com/labstack/echo/v4"
+	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
 )
