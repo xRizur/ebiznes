@@ -1,27 +1,23 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useContext, useReducer, useMemo } from 'react';
+import PropTypes from 'prop-types';
 
-// Create a Context
 const CartContext = createContext();
 
-// Initial state
 const initialState = {
   items: [],
   total: 0
 };
 
-// Actions
 const ADD_TO_CART = 'ADD_TO_CART';
 const REMOVE_FROM_CART = 'REMOVE_FROM_CART';
 const CLEAR_CART = 'CLEAR_CART';
 
-// Reducer function
 function cartReducer(state, action) {
   switch (action.type) {
     case ADD_TO_CART: {
       const existingItem = state.items.find(item => item.id === action.payload.id);
       
       if (existingItem) {
-        // If item exists, increase quantity
         const updatedItems = state.items.map(item => 
           item.id === action.payload.id ? {...item, quantity: item.quantity + 1} : item
         );
@@ -31,7 +27,6 @@ function cartReducer(state, action) {
           total: state.total + action.payload.price
         };
       } else {
-        // Add new item with quantity 1
         return {
           ...state,
           items: [...state.items, {...action.payload, quantity: 1}],
@@ -45,7 +40,6 @@ function cartReducer(state, action) {
       if (!itemToRemove) return state;
 
       if (itemToRemove.quantity > 1) {
-        // If quantity > 1, decrease quantity
         const updatedItems = state.items.map(item => 
           item.id === action.payload ? {...item, quantity: item.quantity - 1} : item
         );
@@ -55,7 +49,6 @@ function cartReducer(state, action) {
           total: state.total - itemToRemove.price
         };
       } else {
-        // If quantity is 1, remove the item completely
         return {
           ...state,
           items: state.items.filter(item => item.id !== action.payload),
@@ -72,11 +65,9 @@ function cartReducer(state, action) {
   }
 }
 
-// Provider component
 export const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
   
-  // Action creators
   const addToCart = (product) => {
     dispatch({ type: ADD_TO_CART, payload: product });
   };
@@ -89,20 +80,25 @@ export const CartProvider = ({ children }) => {
     dispatch({ type: CLEAR_CART });
   };
 
+  const contextValue = useMemo(() => ({
+    cart: state.items, 
+    total: state.total, 
+    addToCart, 
+    removeFromCart, 
+    clearCart 
+  }), [state.items, state.total]);
+
   return (
-    <CartContext.Provider value={{ 
-      cart: state.items, 
-      total: state.total, 
-      addToCart, 
-      removeFromCart, 
-      clearCart 
-    }}>
+    <CartContext.Provider value={contextValue}>
       {children}
     </CartContext.Provider>
   );
 };
 
-// Custom hook
+CartProvider.propTypes = {
+  children: PropTypes.node.isRequired
+};
+
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {

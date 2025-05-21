@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const Payment = ({ cart, processPayment }) => {
   const navigate = useNavigate();
@@ -95,9 +96,10 @@ const Payment = ({ cart, processPayment }) => {
 
       <form className="payment-form" onSubmit={handleSubmit}>
         <div>
-          <label>Numer karty:</label>
+          <label htmlFor="cardNumber">Numer karty:</label>
           <input
             type="text"
+            id="cardNumber"
             name="cardNumber"
             value={formData.cardNumber}
             onChange={handleChange}
@@ -107,9 +109,10 @@ const Payment = ({ cart, processPayment }) => {
         </div>
 
         <div>
-          <label>Imię i nazwisko:</label>
+          <label htmlFor="cardHolder">Imię i nazwisko:</label>
           <input
             type="text"
+            id="cardHolder"
             name="cardHolder"
             value={formData.cardHolder}
             onChange={handleChange}
@@ -119,9 +122,10 @@ const Payment = ({ cart, processPayment }) => {
         </div>
 
         <div>
-          <label>Data ważności:</label>
+          <label htmlFor="expiryDate">Data ważności:</label>
           <input
             type="text"
+            id="expiryDate"
             name="expiryDate"
             value={formData.expiryDate}
             onChange={handleChange}
@@ -131,9 +135,10 @@ const Payment = ({ cart, processPayment }) => {
         </div>
 
         <div>
-          <label>CVV:</label>
+          <label htmlFor="cvv">CVV:</label>
           <input
             type="text"
+            id="cvv"
             name="cvv"
             value={formData.cvv}
             onChange={handleChange}
@@ -150,6 +155,18 @@ const Payment = ({ cart, processPayment }) => {
       </form>
     </div>
   );
+};
+
+Payment.propTypes = {
+  cart: PropTypes.arrayOf(PropTypes.shape({
+    productId: PropTypes.number.isRequired,
+    product: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      price: PropTypes.number.isRequired
+    }).isRequired,
+    quantity: PropTypes.number.isRequired
+  })).isRequired,
+  processPayment: PropTypes.func.isRequired
 };
 
 export default Payment;

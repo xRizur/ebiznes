@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const Products = ({ products, loading, addToCart }) => {
   if (loading) {
@@ -21,6 +22,23 @@ const Products = ({ products, loading, addToCart }) => {
       </div>
     </div>
   );
+};
+
+Products.propTypes = {
+  products: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    imageUrl: PropTypes.string.isRequired
+  })).isRequired,
+  loading: PropTypes.bool.isRequired,
+  addToCart: PropTypes.func.isRequired
+};
+
+Products.defaultProps = {
+  products: [],
+  loading: false
 };
 
 export default Products;
