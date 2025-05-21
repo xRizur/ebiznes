@@ -1,5 +1,0 @@
-version: '3.8'
-services:
-  java-hello:
-    build: .
-    command: ["java", "-cp", "build/libs/hello-world-1.0.0.jar", "com.example.HelloWorld"]
