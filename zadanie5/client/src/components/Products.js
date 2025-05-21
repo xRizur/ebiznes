@@ -31,8 +31,8 @@ Products.propTypes = {
     description: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
     imageUrl: PropTypes.string.isRequired
-  })).isRequired,
-  loading: PropTypes.bool.isRequired,
+  })),
+  loading: PropTypes.bool,
   addToCart: PropTypes.func.isRequired
 };
 
