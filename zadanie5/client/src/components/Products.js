@@ -13,8 +13,8 @@ const Products = ({ products, loading, addToCart }) => {
           <div key={product.id} className="product-card">
             <img src={product.imageUrl} alt={product.name} style={{ maxWidth: '100%' }} />
             <h3>{product.name}</h3>
-            <p>{product.description}</p>
-            <p>Cena: {product.price.toFixed(2)} zł</p>
+            <p className="description">{product.description}</p>
+            <p className="price">Cena: {product.price.toFixed(2)} zł</p>
             <button onClick={() => addToCart(product)}>Dodaj do koszyka</button>
           </div>
         ))}

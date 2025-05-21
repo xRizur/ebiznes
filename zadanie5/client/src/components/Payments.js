@@ -40,7 +40,6 @@ function Payments() {
     setError(null);
     
     try {
-      // Prepare order data
       const orderData = {
         customer: {
           fullName: formData.fullName,
@@ -60,7 +59,6 @@ function Payments() {
         total: total
       };
       
-      // Send to server with CORS headers
       await axios.post('http://localhost:8080/orders', orderData, {
         headers: {
           'Content-Type': 'application/json',

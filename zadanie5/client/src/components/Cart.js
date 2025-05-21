@@ -2,8 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Cart = ({ cart, setCart }) => {
-  const removeFromCart = (itemId) => {
-    setCart(cart.filter(item => item.productId !== itemId));
+  const safeCart = cart || [];
+
+  console.log('Cart state in Cart component:', safeCart);
+  
+  const removeFromCart = (productId) => {
+    setCart(safeCart.filter(item => item.productId !== productId));
   };
 
   const updateQuantity = (productId, newQuantity) => {
@@ -12,16 +16,17 @@ const Cart = ({ cart, setCart }) => {
       return;
     }
 
-    setCart(cart.map(item => 
+    setCart(safeCart.map(item => 
       item.productId === productId 
         ? { ...item, quantity: newQuantity } 
         : item
     ));
   };
 
-  const totalAmount = cart.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+  const totalAmount = safeCart.reduce((total, item) => 
+    total + (item.product ? item.product.price * item.quantity : 0), 0);
 
-  if (cart.length === 0) {
+  if (safeCart.length === 0) {
     return (
       <div>
         <h1>Koszyk</h1>
@@ -45,16 +50,16 @@ const Cart = ({ cart, setCart }) => {
           </tr>
         </thead>
         <tbody>
-          {cart.map((item) => (
+          {safeCart.map((item) => (
             <tr key={item.productId}>
-              <td>{item.product.name}</td>
-              <td>{item.product.price.toFixed(2)} zł</td>
+              <td>{item.product ? item.product.name : 'Produkt niedostępny'}</td>
+              <td>{item.product ? item.product.price.toFixed(2) : 0} zł</td>
               <td>
                 <button onClick={() => updateQuantity(item.productId, item.quantity - 1)}>-</button>
-                {item.quantity}
+                <span className="quantity-value">{item.quantity}</span>
                 <button onClick={() => updateQuantity(item.productId, item.quantity + 1)}>+</button>
               </td>
-              <td>{(item.product.price * item.quantity).toFixed(2)} zł</td>
+              <td>{item.product ? (item.product.price * item.quantity).toFixed(2) : 0} zł</td>
               <td>
                 <button onClick={() => removeFromCart(item.productId)}>Usuń</button>
               </td>

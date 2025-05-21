@@ -1,0 +1,20 @@
+#!/bin/sh
+
+echo "🔍 Uruchamiam golangci-lint dla server/..."
+
+cd zadanie5/server || exit 1
+
+if [ ! -f ./tools/golangci-lint ]; then
+  echo "⏬ Instaluję lokalnie golangci-lint..."
+  curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b ./tools v1.56.2
+fi
+
+./tools/golangci-lint run ./...
+status=$?
+
+if [ $status -ne 0 ]; then
+  echo "Znaleziono błędy lintowania. Push zablokowany."
+  exit 1
+fi
+
+echo "Brak błędów. Kontynuuję push."

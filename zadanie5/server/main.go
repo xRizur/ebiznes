@@ -2,8 +2,9 @@ package main
 
 import (
 	"net/http"
+	"strings"
 
-	"github.com/glebarez/sqlite" // Zmiana z gorm.io/driver/sqlite na implementację w czystym Go
+	"github.com/glebarez/sqlite"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
@@ -84,6 +85,14 @@ func main() {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Nieprawidłowe dane"})
 		}
 
+		if !productExists(db, cartItem.ProductID) {
+			return c.JSON(http.StatusNotFound, map[string]string{"error": "Produkt nie istnieje"})
+		}
+
+		var product Product
+		db.First(&product, cartItem.ProductID)
+		cartItem.Product = product
+
 		result := db.Create(&cartItem)
 		if result.Error != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Nie udało się dodać do koszyka"})
@@ -107,6 +116,33 @@ func main() {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Nieprawidłowe dane płatności"})
 		}
 
+		if payment.CardNumber == "" {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Numer karty jest wymagany"})
+		} else if len(strings.ReplaceAll(payment.CardNumber, " ", "")) != 16 ||
+			!isNumeric(strings.ReplaceAll(payment.CardNumber, " ", "")) {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Nieprawidłowy format numeru karty"})
+		}
+
+		if payment.CardHolder == "" {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Imię i nazwisko jest wymagane"})
+		}
+
+		if payment.ExpiryDate == "" {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Data ważności jest wymagana"})
+		} else if !isValidExpiryDate(payment.ExpiryDate) {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Nieprawidłowy format daty"})
+		}
+
+		if payment.CVV == "" {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Kod CVV jest wymagany"})
+		} else if len(payment.CVV) < 3 || len(payment.CVV) > 4 || !isNumeric(payment.CVV) {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Nieprawidłowy format CVV"})
+		}
+
+		if payment.Amount <= 0 {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Kwota płatności jest nieprawidłowa"})
+		}
+
 		payment.Status = "completed"
 		result := db.Create(&payment)
 		if result.Error != nil {
@@ -119,4 +155,39 @@ func main() {
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))
+}
+
+func productExists(db *gorm.DB, productID uint) bool {
+	var product Product
+	result := db.First(&product, productID)
+	return result.Error == nil
+}
+
+func isNumeric(s string) bool {
+	for _, c := range s {
+		if c < '0' || c > '9' {
+			return false
+		}
+	}
+	return true
+}
+
+func isValidExpiryDate(date string) bool {
+	if len(date) != 5 || date[2] != '/' {
+		return false
+	}
+
+	month := date[:2]
+	year := date[3:]
+
+	if !isNumeric(month) || !isNumeric(year) {
+		return false
+	}
+
+	monthNum := 0
+	for _, c := range month {
+		monthNum = monthNum*10 + int(c-'0')
+	}
+
+	return monthNum >= 1 && monthNum <= 12
 }

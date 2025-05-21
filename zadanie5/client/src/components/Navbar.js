@@ -3,18 +3,28 @@ import { Link } from 'react-router-dom';
 
 const Navbar = ({ cartItemsCount }) => {
   return (
-    <header className="App-header">
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Produkty</Link>
+    <nav className="navbar">
+      <div className="navbar-container">
+        <Link to="/" className="navbar-logo">
+          Sklep Internetowy
+        </Link>
+        <ul className="nav-menu">
+          <li className="nav-item">
+            <Link to="/" className="nav-links">
+              Produkty
+            </Link>
           </li>
-          <li>
-            <Link to="/cart">Koszyk ({cartItemsCount})</Link>
+          <li className="nav-item">
+            <Link to="/cart" className="nav-links">
+              Koszyk
+              {cartItemsCount > 0 && (
+                <span className="cart-count">{cartItemsCount}</span>
+              )}
+            </Link>
           </li>
         </ul>
-      </nav>
-    </header>
+      </div>
+    </nav>
   );
 };
 

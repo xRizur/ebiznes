@@ -16,7 +16,24 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Pobieranie produktów
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      try {
+        setCart(JSON.parse(savedCart));
+      } catch (error) {
+        console.error("Failed to parse cart from localStorage", error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (cart && cart.length > 0) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+      console.log('Cart saved to localStorage:', cart);
+    }
+  }, [cart]);
+
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
@@ -35,35 +52,29 @@ function App() {
     fetchProducts();
   }, []);
 
-  // Dodawanie produktu do koszyka
-  const addToCart = async (product) => {
+  const addToCart = (product) => {
     try {
-      // Sprawdź czy produkt już jest w koszyku
+      console.log('Adding to cart:', product);
+
       const existingItem = cart.find(item => item.productId === product.id);
       
       if (existingItem) {
-        // Aktualizuj istniejący element w koszyku
-        const updatedCart = cart.map(item =>
+        const updatedCart = cart.map(item => 
           item.productId === product.id 
             ? { ...item, quantity: item.quantity + 1 } 
             : item
         );
         setCart(updatedCart);
       } else {
-        // Dodaj nowy element do koszyka
-        const newCartItem = {
+        const newItem = {
           productId: product.id,
           product: product,
           quantity: 1
         };
-        
-        // Zapisz do API
-        await axios.post('/cart', newCartItem);
-        
-        // Zaktualizuj stan lokalny
-        setCart([...cart, newCartItem]);
+        setCart([...cart, newItem]);
       }
-      
+
+      alert(`Dodano ${product.name} do koszyka!`);
       setError(null);
     } catch (err) {
       console.error('Error adding to cart:', err);
@@ -71,15 +82,13 @@ function App() {
     }
   };
 
-  // Przetwarzanie płatności
   const processPayment = async (paymentDetails) => {
     try {
       const response = await axios.post('/payments', {
         ...paymentDetails,
         amount: cart.reduce((total, item) => total + (item.product.price * item.quantity), 0)
       });
-      
-      // Po udanej płatności - wyczyść koszyk
+
       if (response.data.status === 'completed') {
         setCart([]);
       }

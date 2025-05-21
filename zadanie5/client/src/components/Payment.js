@@ -65,7 +65,6 @@ const Payment = ({ cart, processPayment }) => {
         amount: totalAmount
       });
       
-      // Po udanej płatności przekieruj do strony głównej
       alert('Płatność została zrealizowana pomyślnie!');
       navigate('/');
     } catch (error) {
